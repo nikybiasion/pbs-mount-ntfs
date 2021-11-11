@@ -6,8 +6,9 @@ declare drivesel
 declare partsel
 declare loopid
 USER=root@pam
-PBS=192.168.0.3
+PBS=192.168.0.3:8007
 DATASTORE=backup
+MOUNTDIR=/mnt/restorewin
 
 function list_snapshots(){
    i=1
@@ -32,7 +33,7 @@ function list_drives(){
 }
 
 function map_backup(){
-   loopid=$(proxmox-backup-client map ${snapsel} ${drivesel} --repository $USER@$PBS:8007:$DATASTORE | awk '{print $NF}')
+   loopid=$(proxmox-backup-client map ${snapsel} ${drivesel} --repository $USER@$PBS:$DATASTORE | awk '{print $NF}')
    partitions=($(lsblk $loopid -l | grep part | awk '{print $1"-"$4}'))
    declare -a menuparts
    i=1
@@ -45,10 +46,10 @@ function map_backup(){
 }
 
 function mount_partition(){
-   mkdir /mnt/restorewin
-   mount.ntfs /dev/$partsel /mnt/restorewin/ -o ro
-   rodee=$(dialog --ascii-lines --title "Restore data" --msgbox "Partition mounted on /mnt/sdc, press ok when finished restore" 0 0 2>&1 >/dev/tty)
-   umount /mnt/restorewin
+   mkdir $MOUNTDIR
+   mount.ntfs /dev/$partsel $MOUNTDIR -o ro
+   status=$(dialog --ascii-lines --title "Restore data" --msgbox "Partition mounted on $MOUNTDIR, press ok when finished restore" 0 0 2>&1 >/dev/tty)
+   umount $MOUNTDIR
 }
 
 function exit_restore(){
