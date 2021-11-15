@@ -11,6 +11,7 @@ DATASTORE=backup
 MOUNTDIR=/mnt/restorewin
 
 function list_snapshots(){
+   snapshots=()
    i=1
    while read snapshot; do
       if [ "z${snapshot}" == "z" ] || [ "${snapshot}" == "snapshot" ]; then continue; fi
@@ -22,6 +23,7 @@ function list_snapshots(){
 }
 
 function list_drives(){
+   drivenames=()
    i=1
    while read drivename; do
      if [ "z${drivename}" == "z" ] || [ "${drivename}" == "filename" ] || [[ "${drivename}" =~ "blob" ]]; then continue; fi
@@ -48,8 +50,12 @@ function map_backup(){
 function mount_partition(){
    mkdir $MOUNTDIR
    mount.ntfs /dev/$partsel $MOUNTDIR -o ro
-   status=$(dialog --ascii-lines --title "Restore data" --msgbox "Partition mounted on $MOUNTDIR, press ok when finished restore" 0 0 2>&1 >/dev/tty)
-   umount $MOUNTDIR
+   if [ $? == 0 ]; then
+      status=$(dialog --ascii-lines --title "Restore data" --msgbox "Partition mounted on $MOUNTDIR, press ok when finished restore" 0 0 2>&1 >/dev/tty)
+      umount $MOUNTDIR
+   else
+     status=$(dialog --ascii-lines --title "Restore data error" --msgbox "Unable to mount partition" 0 0 2>&1 >/dev/tty)
+   fi
 }
 
 function exit_restore(){
@@ -69,8 +75,13 @@ do
         255) continue ;;
         1) continue ;;
         0) map_backup
-           mount_partition
-           exit_restore ;;
+           case $? in
+             255) continue ;;
+             1) continue ;;
+             0)
+                mount_partition
+                exit_restore ;;
+           esac
       esac
     ;;
   esac
