@@ -66,7 +66,7 @@ function mount_partition(){
         mkdir $MOUNTDIR
         mount.ntfs /dev/$partsel $MOUNTDIR -o ro
         if [ $? == 0 ]; then
-                status=$(dialog --ascii-lines --title "Restore data" --msgbox "Partition mounted on $MOUNTDIR, press ok when finished restore" 0 0 2>&1 >/dev/tty)
+                status=$(dialog --ascii-lines --title "Restore data" --msgbox "Partition mounted on $MOUNTDIR, press ok when the restore is finished" 0 0 2>&1 >/dev/tty)
                 umount $MOUNTDIR
                 else
                 status=$(dialog --ascii-lines --title "Restore data error" --msgbox "Unable to mount partition" 0 0 2>&1 >/dev/tty)
