@@ -11,6 +11,7 @@ USER=root@pam
 PBS=192.168.0.3:8007
 DATASTORE=backup
 MOUNTDIR=/mnt/restorewin
+PBS_REPOSITORY=$USER@$PBS:$DATASTORE
 
 function list_groups(){
         groups=()
