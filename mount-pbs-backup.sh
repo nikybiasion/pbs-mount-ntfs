@@ -51,7 +51,7 @@ function list_drives(){
 
 
 function map_backup(){
-        loopid=$(proxmox-backup-client map ${snapsel} ${drivesel} --repository $USER@$PBS:$DATASTORE | awk '{print $NF}')
+        loopid=$(proxmox-backup-client map ${snapsel} ${drivesel} --repository $USER@$PBS:$DATASTORE  2>&1  | awk '{print $NF}')
         partitions=($(lsblk $loopid -l | grep part | awk '{print $1"-"$4}'))
         declare -a menuparts
         i=1
